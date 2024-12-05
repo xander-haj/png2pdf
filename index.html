@@ -67,7 +67,7 @@
         .dark-mode-toggle.active {
             transform: translateX(30px);
         }
-        .dark-mode-toggle .sun, .dark-mode-toggle .moon {
+        .dark-mode-toggle .icon {
             position: absolute;
             top: 0;
             left: 0;
@@ -78,9 +78,6 @@
             align-items: center;
             font-size: 24px;
             color: #333;
-        }
-        .dark-mode-toggle.active .sun {
-            transform: translateX(100%);
         }
     </style>
 </head>
@@ -93,8 +90,8 @@
     </div>
 
     <span class="dark-mode-toggle" onclick="toggleDarkMode()">
-        <span class="sun">&#9786;</span> <!-- Sun icon -->
-        <span class="moon">&#9728;</span> <!-- Moon icon -->
+        <span class="icon sun">&#9786;</span> <!-- Sun icon -->
+        <span class="icon moon hidden">&#9728;</span> <!-- Moon icon -->
     </span>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
@@ -107,6 +104,8 @@
             const container = document.querySelector('.container');
             const button = document.querySelector('button');
             const pdfLink = document.getElementById('pdfLink');
+            const sunIcon = document.querySelector('.icon.sun');
+            const moonIcon = document.querySelector('.icon.moon');
 
             if (isDarkMode) {
                 body.style.backgroundColor = '#f4f4f9';
@@ -115,6 +114,11 @@
                 button.style.backgroundColor = '#007bff';
                 button.style.color = 'white';
                 pdfLink.style.color = '#007bff';
+
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+
+                isDarkMode = false;
             } else {
                 body.style.backgroundColor = '#333';
                 body.style.color = 'white';
@@ -122,9 +126,12 @@
                 button.style.backgroundColor = '#555';
                 button.style.color = 'white';
                 pdfLink.style.color = '#555';
-            }
 
-            isDarkMode = !isDarkMode;
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+
+                isDarkMode = true;
+            }
         }
 
         async function convertToPDF() {
