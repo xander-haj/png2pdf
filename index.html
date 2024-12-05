@@ -13,6 +13,7 @@
             height: 100vh;
             margin: 0;
             background-color: #f4f4f9;
+            color: #333;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
         .container {
@@ -88,16 +89,30 @@
 
         function toggleDarkMode() {
             const body = document.body;
-            const toggle = document.querySelector('.dark-mode-toggle');
+            const container = document.querySelector('.container');
+            const button = document.querySelector('button');
+            const pdfLink = document.getElementById('pdfLink');
+
             if (isDarkMode) {
                 body.style.backgroundColor = '#f4f4f9';
                 body.style.color = '#333';
-                toggle.classList.remove('active');
+                container.style.backgroundColor = 'white';
+                button.style.backgroundColor = '#007bff';
+                button.style.color = 'white';
+                pdfLink.style.color = '#007bff';
+                document.querySelector('.dark-mode-toggle .sun').style.display = '';
+                document.querySelector('.dark-mode-toggle .moon').style.display = 'none';
             } else {
                 body.style.backgroundColor = '#333';
                 body.style.color = 'white';
-                toggle.classList.add('active');
+                container.style.backgroundColor = '#121212';
+                button.style.backgroundColor = '#555';
+                button.style.color = 'white';
+                pdfLink.style.color = '#555';
+                document.querySelector('.dark-mode-toggle .sun').style.display = 'none';
+                document.querySelector('.dark-mode-toggle .moon').style.display = '';
             }
+
             isDarkMode = !isDarkMode;
         }
 
