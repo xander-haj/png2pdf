@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convert PNGs to PDF</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        input[type="file"] {
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .pdf-link {
+            margin-top: 20px;
+            display: none;
+            text-decoration: none;
+            color: #007bff;
+        }
+        .pdf-link:hover {
+            text-decoration: underline;
+        }
+        .dark-mode-toggle {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            cursor: pointer;
+            font-size: 24px;
+            color: #333;
+            transition: transform 0.3s ease;
+        }
+        .dark-mode-toggle.active {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Convert PNGs to PDF</h1>
+        <input type="file" id="fileInput" multiple accept=".png">
+        <button onclick="convertToPDF()">Convert and Download PDF</button>
+        <a href="#" id="pdfLink" class="pdf-link" download="images.pdf">Download PDF</a>
+    </div>
+
+    <span class="dark-mode-toggle" onclick="toggleDarkMode()">
+        &#9786; <!-- Sun icon -->
+    </span>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
+    <script>
+        let isDarkMode = false;
+
+        function toggleDarkMode() {
+            const body = document.body;
+            const toggle = document.querySelector('.dark-mode-toggle');
+            if (isDarkMode) {
+                body.style.backgroundColor = '#f4f4f9';
+                body.style.color = '#333';
+                toggle.innerHTML = '&#9786;'; // Sun icon
+            } else {
+                body.style.backgroundColor = '#333';
+                body.style.color = 'white';
+                toggle.innerHTML = '&#9728;'; // Moon icon
+            }
+            isDarkMode = !isDarkMode;
+            toggle.classList.toggle('active');
+        }
+
+        async function convertToPDF() {
+            const files = document.getElementById('fileInput').files;
+            if (files.length === 0) {
+                alert('Please select at least one PNG file.');
+                return;
+            }
+
+            const images = [];
+            for (let i = 0; i < files.length; i++) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    images.push(event.target.result);
+                    if (images.length === files.length) {
+                        generatePDF(images);
+                    }
+                };
+                reader.readAsDataURL(files[i]);
+            }
+        }
+
+        function generatePDF(images) {
+            const docDefinition = {
+                content: images.map(image => ({
+                    image: image,
+                    width: 500
+                }))
+            };
+
+            pdfMake.createPdf(docDefinition).download('images.pdf');
+        }
+    </script>
+</body>
+</html>
