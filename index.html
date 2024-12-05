@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Convert PNGs to PDF</title>
     <style>
+        /* Basic Layout */
         body {
             font-family: 'Arial', sans-serif;
             display: flex;
@@ -55,6 +56,7 @@
         .pdf-link:hover {
             text-decoration: underline;
         }
+
         /* Dark Mode Toggle Styles */
         .dark-mode-toggle {
             position: absolute;
@@ -66,39 +68,33 @@
             background-color: #ccc;
             border-radius: 15px;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            padding: 5px;
+            position: relative; /* Changed to relative for absolute positioning */
             transition: background-color 0.3s ease;
         }
         .dark-mode-toggle.active {
             background-color: #555;
         }
         .dark-mode-toggle .icon {
-            width: 20px;
-            height: 20px;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: opacity 0.3s ease;
             font-size: 16px;
             color: white;
         }
         .dark-mode-toggle .sun {
-            transform: translateX(0);
+            right: 5px; /* Sun aligned to the right */
             opacity: 1;
         }
         .dark-mode-toggle.active .sun {
-            transform: translateX(40px);
-            opacity: 0;
+            opacity: 0; /* Hide sun when active */
         }
         .dark-mode-toggle .moon {
-            transform: translateX(-60px);
+            left: 5px; /* Moon aligned to the left */
             opacity: 0;
         }
         .dark-mode-toggle.active .moon {
-            transform: translateX(0);
-            opacity: 1;
+            opacity: 1; /* Show moon when active */
         }
     </style>
 </head>
@@ -106,19 +102,20 @@
     <div class="container">
         <h1>Convert PNGs to PDF</h1>
         <input type="file" id="fileInput" multiple accept=".png">
-        <button onclick="convertToPDF()">Convert and Download PDF</button>
+        <button id="convertBtn">Convert and Download PDF</button>
         <a href="#" id="pdfLink" class="pdf-link" download="images.pdf">Download PDF</a>
     </div>
 
     <div class="dark-mode-toggle" onclick="toggleDarkMode()" aria-label="Toggle Dark Mode">
-        <span class="icon sun">&#9728;</span> <!-- Sun icon ☀ -->
-        <span class="icon moon">&#9790;</span> <!-- Moon icon ☽ -->
+        <span class="icon sun">&#9728;</span> <!-- Sun Icon -->
+        <span class="icon moon">&#9790;</span> <!-- Moon Icon -->
     </div>
 
     <!-- PDFMake Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
     <script>
+        /* Dark Mode Toggle Logic */
         let isDarkMode = false;
 
         function toggleDarkMode() {
@@ -152,6 +149,9 @@
                 isDarkMode = true;
             }
         }
+
+        /* File Upload and PDF Conversion Logic */
+        document.getElementById('convertBtn').addEventListener('click', convertToPDF);
 
         async function convertToPDF() {
             const files = document.getElementById('fileInput').files;
