@@ -22,6 +22,7 @@
             padding: 20px;
             border-radius: 15px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         input[type="file"] {
             margin-top: 20px;
@@ -39,6 +40,7 @@
             border: none;
             background-color: #007bff;
             color: white;
+            transition: background-color 0.3s ease;
         }
         button:hover {
             background-color: #0056b3;
@@ -48,10 +50,12 @@
             display: none;
             text-decoration: none;
             color: #007bff;
+            transition: color 0.3s ease;
         }
         .pdf-link:hover {
             text-decoration: underline;
         }
+        /* Dark Mode Toggle Styles */
         .dark-mode-toggle {
             position: absolute;
             top: 15px;
@@ -62,22 +66,39 @@
             background-color: #ccc;
             border-radius: 15px;
             overflow: hidden;
-            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            transition: background-color 0.3s ease;
         }
         .dark-mode-toggle.active {
-            transform: translateX(30px);
+            background-color: #555;
         }
         .dark-mode-toggle .icon {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 50%;
-            height: 100%;
+            width: 20px;
+            height: 20px;
+            transition: transform 0.3s ease, opacity 0.3s ease;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 24px;
-            color: #333;
+            font-size: 16px;
+            color: white;
+        }
+        .dark-mode-toggle .sun {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        .dark-mode-toggle.active .sun {
+            transform: translateX(40px);
+            opacity: 0;
+        }
+        .dark-mode-toggle .moon {
+            transform: translateX(-40px);
+            opacity: 0;
+        }
+        .dark-mode-toggle.active .moon {
+            transform: translateX(0);
+            opacity: 1;
         }
     </style>
 </head>
@@ -89,11 +110,12 @@
         <a href="#" id="pdfLink" class="pdf-link" download="images.pdf">Download PDF</a>
     </div>
 
-    <span class="dark-mode-toggle" onclick="toggleDarkMode()">
-        <span class="icon sun">&#9786;</span> <!-- Sun icon -->
-        <span class="icon moon hidden">&#9728;</span> <!-- Moon icon -->
-    </span>
+    <div class="dark-mode-toggle" onclick="toggleDarkMode()" aria-label="Toggle Dark Mode">
+        <span class="icon sun">&#9728;</span> <!-- Sun icon ☀ -->
+        <span class="icon moon">&#9790;</span> <!-- Moon icon ☽ -->
+    </div>
 
+    <!-- PDFMake Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
     <script>
@@ -104,31 +126,28 @@
             const container = document.querySelector('.container');
             const button = document.querySelector('button');
             const pdfLink = document.getElementById('pdfLink');
-            const sunIcon = document.querySelector('.icon.sun');
-            const moonIcon = document.querySelector('.icon.moon');
+            const toggle = document.querySelector('.dark-mode-toggle');
 
             if (isDarkMode) {
+                // Switch to Light Mode
                 body.style.backgroundColor = '#f4f4f9';
                 body.style.color = '#333';
                 container.style.backgroundColor = 'white';
                 button.style.backgroundColor = '#007bff';
-                button.style.color = 'white';
                 pdfLink.style.color = '#007bff';
 
-                sunIcon.classList.remove('hidden');
-                moonIcon.classList.add('hidden');
+                toggle.classList.remove('active');
 
                 isDarkMode = false;
             } else {
+                // Switch to Dark Mode
                 body.style.backgroundColor = '#333';
                 body.style.color = 'white';
                 container.style.backgroundColor = '#121212';
                 button.style.backgroundColor = '#555';
-                button.style.color = 'white';
                 pdfLink.style.color = '#555';
 
-                sunIcon.classList.add('hidden');
-                moonIcon.classList.remove('hidden');
+                toggle.classList.add('active');
 
                 isDarkMode = true;
             }
@@ -142,11 +161,14 @@
             }
 
             const images = [];
+            let loadedImages = 0;
+
             for (let i = 0; i < files.length; i++) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     images.push(event.target.result);
-                    if (images.length === files.length) {
+                    loadedImages++;
+                    if (loadedImages === files.length) {
                         generatePDF(images);
                     }
                 };
@@ -158,11 +180,17 @@
             const docDefinition = {
                 content: images.map(image => ({
                     image: image,
-                    width: 500
+                    width: 500,
+                    margin: [0, 10, 0, 10]
                 }))
             };
 
-            pdfMake.createPdf(docDefinition).download('images.pdf');
+            pdfMake.createPdf(docDefinition).getBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const pdfLink = document.getElementById('pdfLink');
+                pdfLink.href = url;
+                pdfLink.style.display = 'block';
+            });
         }
     </script>
 </body>
