@@ -254,20 +254,29 @@
         }
 
         function generatePDF(images) {
+            const pageWidth = 595.28; // A4 width in points
+            const pageHeight = 841.89; // A4 height in points
+            const margin = 0; // Zero margins
+
             const docDefinition = {
+                pageSize: {
+                    width: pageWidth,
+                    height: pageHeight
+                },
+                pageMargins: [margin, margin, margin, margin], // [left, top, right, bottom]
                 content: images.map(image => ({
                     image: image,
-                    width: 500,
-                    margin: [0, 10, 0, 10]
-                }))
+                    fit: [pageWidth, pageHeight],
+                    alignment: 'center',
+                    margin: [0, 0, 0, 0],
+                })),
+                // Ensure each image starts on a new page
+                pageBreakBefore: function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
+                    return currentNode.headlineLevel === 1 && currentNode.pageNumbers.length > 1;
+                }
             };
 
-            pdfMake.createPdf(docDefinition).getBlob((blob) => {
-                const url = URL.createObjectURL(blob);
-                const pdfLink = document.getElementById('pdfLink');
-                pdfLink.href = url;
-                pdfLink.style.display = 'block';
-            });
+            pdfMake.createPdf(docDefinition).download('images.pdf');
         }
     </script>
 </body>
