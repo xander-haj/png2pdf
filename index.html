@@ -5,33 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Convert PNGs to PDF</title>
     <style>
-        /* Basic Layout */
+        /* Basic Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Body Styling */
         body {
             font-family: 'Arial', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
             background-color: #f4f4f9;
             color: #333;
             transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative; /* For positioning the toggle */
         }
+
+        /* Container Styling */
         .container {
             text-align: center;
             background-color: white;
-            padding: 20px;
+            padding: 30px 20px;
             border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             transition: background-color 0.3s ease, color 0.3s ease;
         }
+
+        /* File Input Styling */
         input[type="file"] {
             margin-top: 20px;
             padding: 10px;
             font-size: 16px;
             border-radius: 5px;
             border: 1px solid #ccc;
+            width: 100%;
+            max-width: 300px;
         }
+
+        /* Button Styling */
         button {
             margin-top: 20px;
             padding: 10px 20px;
@@ -43,9 +58,12 @@
             color: white;
             transition: background-color 0.3s ease;
         }
+
         button:hover {
             background-color: #0056b3;
         }
+
+        /* PDF Link Styling */
         .pdf-link {
             margin-top: 20px;
             display: none;
@@ -53,52 +71,122 @@
             color: #007bff;
             transition: color 0.3s ease;
         }
+
         .pdf-link:hover {
             text-decoration: underline;
+        }
+
+        /* Dark Mode Styling */
+        body.dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .container {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode button {
+            background-color: #555;
+        }
+
+        body.dark-mode button:hover {
+            background-color: #333;
+        }
+
+        body.dark-mode .pdf-link {
+            color: #bbb;
         }
 
         /* Dark Mode Toggle Styles */
         .dark-mode-toggle {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            cursor: pointer;
+            top: 20px;
+            right: 20px;
             width: 60px;
             height: 30px;
             background-color: #ccc;
             border-radius: 15px;
-            overflow: hidden;
-            position: relative; /* Changed to relative for absolute positioning */
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            cursor: pointer;
             transition: background-color 0.3s ease;
         }
+
         .dark-mode-toggle.active {
             background-color: #555;
         }
+
+        .dark-mode-toggle .toggle-knob {
+            width: 24px;
+            height: 24px;
+            background-color: white;
+            border-radius: 50%;
+            position: relative;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .dark-mode-toggle.active .toggle-knob {
+            transform: translateX(30px);
+        }
+
+        /* Icons Styling */
         .dark-mode-toggle .icon {
             position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            transition: opacity 0.3s ease;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             font-size: 16px;
             color: white;
+            transition: opacity 0.3s ease;
         }
-        .dark-mode-toggle .sun {
-            right: 5px; /* Sun aligned to the right */
+
+        .dark-mode-toggle .icon.sun {
+            left: 8px;
             opacity: 1;
         }
-        .dark-mode-toggle.active .sun {
-            opacity: 0; /* Hide sun when active */
-        }
-        .dark-mode-toggle .moon {
-            left: 5px; /* Moon aligned to the left */
+
+        .dark-mode-toggle.active .icon.sun {
             opacity: 0;
         }
-        .dark-mode-toggle.active .moon {
-            opacity: 1; /* Show moon when active */
+
+        .dark-mode-toggle .icon.moon {
+            right: 8px;
+            opacity: 0;
+        }
+
+        .dark-mode-toggle.active .icon.moon {
+            opacity: 1;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            .dark-mode-toggle {
+                top: 15px;
+                right: 15px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Dark Mode Toggle -->
+    <div class="dark-mode-toggle" onclick="toggleDarkMode()" aria-label="Toggle Dark Mode">
+        <span class="icon sun">&#9728;</span> <!-- Sun Icon ☀ -->
+        <span class="icon moon">&#9790;</span> <!-- Moon Icon ☽ -->
+        <div class="toggle-knob"></div>
+    </div>
+
+    <!-- Main Content Container -->
     <div class="container">
         <h1>Convert PNGs to PDF</h1>
         <input type="file" id="fileInput" multiple accept=".png">
@@ -106,48 +194,20 @@
         <a href="#" id="pdfLink" class="pdf-link" download="images.pdf">Download PDF</a>
     </div>
 
-    <div class="dark-mode-toggle" onclick="toggleDarkMode()" aria-label="Toggle Dark Mode">
-        <span class="icon sun">&#9728;</span> <!-- Sun Icon -->
-        <span class="icon moon">&#9790;</span> <!-- Moon Icon -->
-    </div>
-
     <!-- PDFMake Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
     <script>
         /* Dark Mode Toggle Logic */
-        let isDarkMode = false;
-
         function toggleDarkMode() {
             const body = document.body;
-            const container = document.querySelector('.container');
-            const button = document.querySelector('button');
-            const pdfLink = document.getElementById('pdfLink');
             const toggle = document.querySelector('.dark-mode-toggle');
 
-            if (isDarkMode) {
-                // Switch to Light Mode
-                body.style.backgroundColor = '#f4f4f9';
-                body.style.color = '#333';
-                container.style.backgroundColor = 'white';
-                button.style.backgroundColor = '#007bff';
-                pdfLink.style.color = '#007bff';
+            // Toggle the 'dark-mode' class on the body
+            body.classList.toggle('dark-mode');
 
-                toggle.classList.remove('active');
-
-                isDarkMode = false;
-            } else {
-                // Switch to Dark Mode
-                body.style.backgroundColor = '#333';
-                body.style.color = 'white';
-                container.style.backgroundColor = '#121212';
-                button.style.backgroundColor = '#555';
-                pdfLink.style.color = '#555';
-
-                toggle.classList.add('active');
-
-                isDarkMode = true;
-            }
+            // Toggle the 'active' class on the toggle switch
+            toggle.classList.toggle('active');
         }
 
         /* File Upload and PDF Conversion Logic */
@@ -164,6 +224,14 @@
             let loadedImages = 0;
 
             for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+
+                // Validate file type
+                if (file.type !== 'image/png') {
+                    alert(`File "${file.name}" is not a PNG image.`);
+                    return;
+                }
+
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     images.push(event.target.result);
@@ -172,7 +240,10 @@
                         generatePDF(images);
                     }
                 };
-                reader.readAsDataURL(files[i]);
+                reader.onerror = () => {
+                    alert(`Failed to read file "${file.name}".`);
+                };
+                reader.readAsDataURL(file);
             }
         }
 
