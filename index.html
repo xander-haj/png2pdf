@@ -60,8 +60,11 @@
             color: #333;
             transition: transform 0.3s ease;
         }
-        .dark-mode-toggle.active {
-            transform: rotate(180deg);
+        .dark-mode-toggle.active .sun {
+            display: none;
+        }
+        .dark-mode-toggle.active .moon {
+            display: inline-block;
         }
     </style>
 </head>
@@ -74,7 +77,8 @@
     </div>
 
     <span class="dark-mode-toggle" onclick="toggleDarkMode()">
-        &#9786; <!-- Sun icon -->
+        <span class="sun">&#9786;</span> <!-- Sun icon -->
+        <span class="moon" style="display: none;">&#9728;</span> <!-- Moon icon -->
     </span>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
@@ -88,14 +92,13 @@
             if (isDarkMode) {
                 body.style.backgroundColor = '#f4f4f9';
                 body.style.color = '#333';
-                toggle.innerHTML = '&#9786;'; // Sun icon
+                toggle.classList.remove('active');
             } else {
                 body.style.backgroundColor = '#333';
                 body.style.color = 'white';
-                toggle.innerHTML = '&#9728;'; // Moon icon
+                toggle.classList.add('active');
             }
             isDarkMode = !isDarkMode;
-            toggle.classList.toggle('active');
         }
 
         async function convertToPDF() {
